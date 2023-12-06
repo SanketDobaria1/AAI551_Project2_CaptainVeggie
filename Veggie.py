@@ -5,22 +5,73 @@
 from FieldInhabitant import FieldInhabitant
 
 class Veggie(FieldInhabitant):
-    def _init_(self, name, symbol, points):
-        super()._init_(symbol)
-        self._name = name
-        self._points = points
+    """
+    Represents a vegetable in the field, inheriting from FieldInhabitant.
 
-    def _str_(self):
-        return f"{self._symbol}: {self._name} {self._points} points"
+    :param name: Name of the vegetable.
+    :type name: str
+    :param symbol: Symbol representing the vegetable.
+    :type symbol: str
+    :param points: Points associated with the vegetable.
+    :type points: int
+    """
 
-    def get_name(self):
-        return self._name
+    def __init__(self, name, symbol, points):
+        """
+        Initialize a new Veggie.
 
-    def set_name(self, value):
-        self._name = value
+        :param name: Name of the vegetable.
+        :type name: str
+        :param symbol: Symbol representing the vegetable.
+        :type symbol: str
+        :param points: Points associated with the vegetable.
+        :type points: int
+        """
+        super().__init__(symbol)
+        self.__name = name
+        self.__points = points
 
-    def get_points(self):
-        return self._points
+    def getName(self):
+        """
+        Get the name of the vegetable.
 
-    def set_points(self, value):
-        self._points = value
+        :return: Name of the vegetable.
+        :rtype: str
+        """
+        return self.__name
+
+    def setName(self, name):
+        """
+        Set the name of the vegetable.
+
+        :param name: New name of the vegetable.
+        :type name: str
+        """
+        self.__name = name
+
+    def getPoints(self):
+        """
+        Get the points associated with the vegetable.
+
+        :return: Points associated with the vegetable.
+        :rtype: int
+        """
+        return self.__points
+
+    def setPoints(self, points):
+        """
+        Set the points associated with the vegetable.
+
+        :param points: New points associated with the vegetable.
+        :type points: int
+        """
+        self.__points = points
+
+    def __str__(self):
+        """
+        Get a string representation of the vegetable.
+
+        :return: String representation of the vegetable.
+        :rtype: str
+        """
+        return f"{self._symbol}: {self.__name} {self.__points} points"
