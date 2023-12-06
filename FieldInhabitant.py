@@ -1,13 +1,37 @@
 # Author: Sanket Dobaria, Sameer Bhalala
 # Date: 12/2/23
 
-
 class FieldInhabitant:
-    def _init_(self, symbol):
+    """
+    Represents an inhabitant in the field.
+
+    :param symbol: Symbol representing the inhabitant.
+    :type symbol: str
+    """
+
+    def __init__(self, symbol):
+        """
+        Initialize a new FieldInhabitant.
+
+        :param symbol: Symbol representing the inhabitant.
+        :type symbol: str
+        """
         self._symbol = symbol
 
-    def get_symbol(self):
+    def getSymbol(self):
+        """
+        Get the symbol representing the inhabitant.
+
+        :return: Symbol representing the inhabitant.
+        :rtype: str
+        """
         return self._symbol
 
-    def set_symbol(self, value):
-        self._symbol = value
+    def setSymbol(self, symbol):
+        """
+        Set the symbol representing the inhabitant.
+
+        :param symbol: New symbol representing the inhabitant.
+        :type symbol: str
+        """
+        self._symbol = symbol
