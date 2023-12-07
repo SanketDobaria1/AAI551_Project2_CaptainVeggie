@@ -7,6 +7,7 @@ import pickle
 from Captain import Captain
 from Rabbit import Rabbit
 from Veggie import Veggie
+from Snake import Snake
 
 
 class GameEngine:
@@ -19,6 +20,7 @@ class GameEngine:
     - __captain (Captain): The captain creature on the field.
     - __possible_veggies (list): List of possible vegetable types in the game.
     - __score (int): Current score in the game.
+    - __snake (Snake): The snake object in the game.
     """
 
     # Private constants
@@ -37,6 +39,7 @@ class GameEngine:
         self.__captain = None
         self.__possible_veggies = []
         self.__score = 0
+        self.__snake = None
 
     def initVeggies(self):
         # Prompt the user for the name of the veggie file
@@ -91,6 +94,20 @@ class GameEngine:
                     self.__rabbits.append(rabbit)
                     break
 
+    def initSnake(self):
+        """
+        Instantiate a new Snake object in a random, unoccupied slot in the field.
+        """
+        if self.__snake is None:
+            while True:
+                x = random.randint(0, len(self.__field[0]) - 1)
+                y = random.randint(0, len(self.__field) - 1)
+
+                if self.__field[y][x] is None:
+                    self.__snake = Snake(x, y)
+                    self.__field[y][x] = self.__snake
+                    break
+
     def initializeGame(self):
         """
         Initialize the game by placing vegetables, captain, and rabbits on the field.
@@ -98,6 +115,7 @@ class GameEngine:
         self.initVeggies()
         self.initCaptain()
         self.initRabbits()
+        self.initSnake()
 
     def remainingVeggies(self):
         remaining_veggies_count = 0
@@ -190,6 +208,80 @@ class GameEngine:
             else:
                 continue
     
+    def removeLastFiveVeggies(self):
+        """
+        Remove the last five vegetables from the captain's collected veggies list and deduct the points.
+        """
+        if len(self.__captain.getCollectedVeggies()) >= 5:
+            # Remove the last five vegetables
+            removed_veggies = self.__captain.getCollectedVeggies()[-5:]
+            del self.__captain.getCollectedVeggies()[-5:]
+
+            print("Oh no! The captain lost the last five vegetables:")
+            for veggie in removed_veggies:
+                print(veggie)
+            # Deduct the points for the lost vegetables
+            lost_points = sum(veggie.getPoints() for veggie in removed_veggies)
+            self.__score -= lost_points
+        else:
+            # If fewer than five vegetables, remove all of them
+            removed_veggies = self.__captain.getCollectedVeggies().copy()
+            self.__captain.getCollectedVeggies().clear()
+
+            print("Oh no! The captain lost all the vegetables:")
+            for veggie in removed_veggies:
+                print(veggie)
+            # Deduct the points for the lost vegetables
+            lost_points = sum(veggie.getPoints() for veggie in removed_veggies)
+            self.__score -= lost_points
+
+    def moveSnake(self):
+        """
+        Move the snake on the field, attempting to move closer to the captain's position.
+        """
+        if self.__snake is not None:
+            captain_x, captain_y = self.__captain.getX(), self.__captain.getY()
+
+            # Determine the direction to move (closer to the captain)
+            if captain_x < self.__snake.getX():
+                dx, dy = -1, 0
+            elif captain_x > self.__snake.getX():
+                dx, dy = 1, 0
+            elif captain_y < self.__snake.getY():
+                dx, dy = 0, -1
+            elif captain_y > self.__snake.getY():
+                dx, dy = 0, 1
+            else:
+                dx, dy = 0, 0
+
+            new_x, new_y = self.__snake.getX() + dx, self.__snake.getY() + dy
+
+            # Check if the target position is within the field
+            if 0 <= new_x < len(self.__field[0]) and 0 <= new_y < len(self.__field):
+                new_location = self.__field[new_y][new_x]
+
+                # Check if the target position is unoccupied by a vegetable or a rabbit
+                if new_location is None or not isinstance(new_location, (Veggie, Rabbit)):
+                    # Move snake to new location in the field
+                    self.__field[new_y][new_x] = self.__snake
+
+                    # Set snake's previous location to None
+                    self.__field[self.__snake.getY()][self.__snake.getX()] = None
+                    
+                    # Update snake's position
+                    self.__snake.setX(new_x)
+                    self.__snake.setY(new_y)
+
+                    # Check if the snake moves into the captain's position
+                    if new_x == captain_x and new_y == captain_y:
+                        # Reset the snake to a new random, unoccupied position
+                        self.__snake = None
+                        self.__field[new_y][new_x] = self.__captain
+                        self.initSnake()
+
+                        # Reduce the captain's veggie basket by the last five vegetables
+                        self.removeLastFiveVeggies()
+
     def moveCptVertical(self, dy):
         new_y = self.__captain.getY() + dy
 
